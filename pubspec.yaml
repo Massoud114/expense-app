@@ -30,6 +30,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  sqflite: ^2.2.8 # Pour SQLite
+  path_provider: ^2.0.15 # Pour accéder au système de fichiers
+  provider: ^6.1.3 # Pour la gestion d'état
+  intl: ^0.17.0 # Version compatible avec charts_flutter
+  fl_chart: ^0.68.0
+  sqflite_common_ffi: any
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
