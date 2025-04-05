@@ -21,8 +21,6 @@ void main() async {
   runApp(MyApp());
 }
 
-
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -57,7 +55,7 @@ class _RootPortalState extends State<RootPortal> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _realmPortals[_currentRealm],
+      body: IndexedStack(index: _currentRealm, children: _realmPortals),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentRealm,

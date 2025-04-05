@@ -26,10 +26,13 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   Future<void> _fetchData() async {
     setState(() => _isLoading = true);
-    
-    final expenses = await _mysticalArchive.readExpensesByDateRange(_startTimeMark, _endTimeMark);
+
+    final expenses = await _mysticalArchive.readExpensesByDateRange(
+      _startTimeMark,
+      _endTimeMark,
+    );
     final categories = await _mysticalArchive.readAllCategories();
-    
+
     setState(() {
       _grimoire = expenses;
       _realms = categories;
@@ -39,20 +42,24 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   String _getCategoryName(int categoryId) {
     try {
-      return _realms.firstWhere((realm) => realm.ident == categoryId).denomination;
+      return _realms
+          .firstWhere((realm) => realm.ident == categoryId)
+          .denomination;
     } catch (e) {
       return 'Inconnu';
     }
   }
 
   Future<void> _showDateRangePicker() async {
+    final now = DateTime.now();
+
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(2020),
-      lastDate: DateTime(2025),
+      lastDate: now.add(Duration(days: 365)), // 1 an après aujourd'hui
       initialDateRange: DateTimeRange(start: _startTimeMark, end: _endTimeMark),
     );
-    
+
     if (picked != null) {
       setState(() {
         _startTimeMark = picked.start;
@@ -65,8 +72,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   @override
   Widget build(BuildContext context) {
     final dateFormatter = DateFormat('dd/MM/yyyy');
-    final currencyFormatter = NumberFormat.currency(symbol: 'FCFA ', decimalDigits: 0);
-    
+    final currencyFormatter = NumberFormat.currency(
+      symbol: 'FCFA ',
+      decimalDigits: 0,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Liste des dépenses'),
@@ -77,60 +87,80 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           ),
         ],
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      Icon(Icons.date_range),
-                      SizedBox(width: 8),
-                      Text(
-                        'Du ${dateFormatter.format(_startTimeMark)} au ${dateFormatter.format(_endTimeMark)}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: _grimoire.isEmpty
-                      ? Center(child: Text('Aucune dépense pour cette période'))
-                      : ListView.builder(
-                          itemCount: _grimoire.length,
-                          itemBuilder: (context, index) {
-                            final expense = _grimoire[index];
-                            return Card(
-                              margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                              child: ListTile(
-                                title: Text(expense.descriptor),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(_getCategoryName(expense.categoryRef)),
-                                    Text(dateFormatter.format(expense.occurredOn)),
-                                    if (expense.annotation != null && expense.annotation!.isNotEmpty)
-                                      Text('Note: ${expense.annotation}', 
-                                           style: TextStyle(fontStyle: FontStyle.italic)),
-                                  ],
-                                ),
-                                trailing: Text(
-                                  currencyFormatter.format(expense.debit),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                                isThreeLine: true,
-                              ),
-                            );
-                          },
+      body:
+          _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Icon(Icons.date_range),
+                        SizedBox(width: 8),
+                        Text(
+                          'Du ${dateFormatter.format(_startTimeMark)} au ${dateFormatter.format(_endTimeMark)}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                ),
-              ],
-            ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child:
+                        _grimoire.isEmpty
+                            ? Center(
+                              child: Text('Aucune dépense pour cette période'),
+                            )
+                            : ListView.builder(
+                              itemCount: _grimoire.length,
+                              itemBuilder: (context, index) {
+                                final expense = _grimoire[index];
+                                return Card(
+                                  margin: EdgeInsets.symmetric(
+                                    vertical: 4,
+                                    horizontal: 16,
+                                  ),
+                                  child: ListTile(
+                                    title: Text(expense.descriptor),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _getCategoryName(expense.categoryRef),
+                                        ),
+                                        Text(
+                                          dateFormatter.format(
+                                            expense.occurredOn,
+                                          ),
+                                        ),
+                                        if (expense.annotation != null &&
+                                            expense.annotation!.isNotEmpty)
+                                          Text(
+                                            'Note: ${expense.annotation}',
+                                            style: TextStyle(
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    trailing: Text(
+                                      currencyFormatter.format(expense.debit),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                    isThreeLine: true,
+                                  ),
+                                );
+                              },
+                            ),
+                  ),
+                ],
+              ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'add_expense',
         child: Icon(Icons.add),
         onPressed: () async {
           final result = await Navigator.push(
