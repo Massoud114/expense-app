@@ -30,6 +30,7 @@ class MyBudgetApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: HomePage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -45,11 +46,11 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
+    DashboardPage(),
     CategoriesPage(),
     BudgetsPage(),
     ExpensesPage(),
     IncomesPage(),
-    DashboardPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -67,11 +68,11 @@ class _HomePageState extends State<HomePage> {
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Tableau de Bord'),
           BottomNavigationBarItem(icon: Icon(Icons.category), label: 'Catégories'),
           BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet), label: 'Budgets'),
           BottomNavigationBarItem(icon: Icon(Icons.money_off), label: 'Dépenses'),
           BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Revenus'),
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Tableau de Bord'),
         ],
       ),
     );

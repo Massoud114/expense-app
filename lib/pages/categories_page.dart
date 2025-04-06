@@ -36,7 +36,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Catégories de Dépense')),
+      appBar: AppBar(title: Text('Catégories de dépense')),
       body: ListView.builder(
         itemCount: categories.length,
         itemBuilder: (context, index) {
